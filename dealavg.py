@@ -1,58 +1,32 @@
 import random
 
-numofsim = input("enter number of simulations: \n")
-numofsim = int(numofsim)
-numlands = 33
-nummanarocks = 8
-deck = []
+def main():
+    numofsim = int(input("Enter number of simulations: \n"))
+    numlands = 33
+    nummanarocks = 8
+    deck = ["l"] * numlands + ["r"] * nummanarocks + ["c"] * (100 - numlands - nummanarocks)
 
-while len(deck) < numlands:
-    deck.append("l")
+    def simdeal():
+        hand = random.sample(deck, 7)
+        lands = hand.count("l")
+        rocks = hand.count("r")
+        rest = hand.count("c")
+        return lands, rocks, rest
 
-while len(deck) - numlands < nummanarocks:
-    deck.append("r")
+    totallands = totalrocks = totalrest = 0
+    for _ in range(numofsim):
+        lands, rocks, rest = simdeal()
+        totallands += lands
+        totalrocks += rocks
+        totalrest += rest
 
-while len(deck) < 100:
-    deck.append("c")
+    avg_lands = totallands / numofsim
+    avg_rocks = totalrocks / numofsim
+    avg_mana = (totallands + totalrocks) / numofsim
 
-print(deck)
-print(len(deck))
+    print("Avg number of lands:", avg_lands)
+    print("Avg number of manarocks:", avg_rocks)
+    print("Avg number of mana cards:", avg_mana)
 
-def simdeal():
-    hand = []
-    i = 0
-    
-    while i < 7:
-        hand.append(random.choice(deck))
-        i += 1
-    # print(hand)
-    lands = 0
-    rocks = 0
-    rest = 0
-
-    while len(hand) > 0:
-        j = hand.pop(0)
-        if j == "l":
-            lands += 1
-        elif j == "r":
-            rocks += 1
-        else:
-            rest += 1
-
-    return [lands, rocks, rest]
-
-totallands = 0
-totalrocks = 0
-totalrest = 0
-k = 0
-while k < numofsim:
-    sim = simdeal()
-    totallands += int(sim.pop(0))
-    totalrocks += int(sim.pop(0))
-    totalrest += int(sim.pop(0))
-    k += 1
-print(k)
-print("Avg number of lands: " + str(totallands/numofsim))
-print("Avg number of manarocks: " + str(totalrocks/numofsim))
-mana = totallands + totalrocks
-print("Avg number of mana cards: " + str(mana/numofsim))
+if __name__ == "__main__":
+    main()
