@@ -51,21 +51,21 @@ def mainthree():
 
     def simdeal():
         hand = random.sample(deck, 7)
-        print(hand)
-        ulands = hand.count("lu")
-        blands = hand.count("lb")
-        rlands = hand.count("lr")
-        bulands = hand.count("lbu")
-        rulands = hand.count("lru")
-        rblands = hand.count("lrb")
-        rbulands = hand.count("lrbu")
+        ####print(hand)
+        #ulands = hand.count("lu")
+        #blands = hand.count("lb")
+        #rlands = hand.count("lr")
+        #bulands = hand.count("lbu")
+        #rulands = hand.count("lru")
+        #rblands = hand.count("lrb")
+        #rbulands = hand.count("lrbu")
         
-        urocks = hand.count("Ru")
-        brocks = hand.count("Rb")
-        rrocks = hand.count("Rr")
-        burocks = hand.count("Rbu")
-        rurocks = hand.count("Rru")
-        rbrocks = hand.count("Rrb")
+        #urocks = hand.count("Ru")
+        #brocks = hand.count("Rb")
+        #rrocks = hand.count("Rr")
+        #burocks = hand.count("Rbu")
+        #rurocks = hand.count("Rru")
+        #rbrocks = hand.count("Rrb")
 
         blue = red = black = 0
         for i in range(len(hand)):
@@ -76,10 +76,10 @@ def mainthree():
             elif "r" in hand[i]:
                 red += 1  
         
-        rest = hand.count("c")
+        # rest = hand.count("c")
         # return ulands, blands, rlands, bulands, rulands, rblands, rbulands, urocks, brocks, rrocks, burocks, rurocks, rbrocks, rest, blue, red, black
         return blue, red, black
-################################################################################## UNFINISHED UNDER THIS LINE ##################################################################################
+
     totalblue = totalred = totalblack = 0
     for _ in range(numofsim):
         blue, red, black = simdeal()
