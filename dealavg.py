@@ -46,7 +46,9 @@ def mainthree():
     numrrocks = int(input("Enter number of purely red rocks: "))
     numrurocks = int(input("Enter number of purely red+blue rocks: "))
     numrbrocks = int(input("Enter number of purely red+black rocks: "))
-    deck = ["lu"] * numulands + ["lb"] * numblands + ["lbu"] * numbulands + ["lr"] * numrlands + ["lru"] * numrulands + ["lrb"] * numrblands + ["lrbu"] * numrbulands + ["Ru"] * numurocks + ["Rb"] * numbrocks + ["Rbu"] * numburocks + ["Rr"] * numrrocks + ["Rru"] * numrurocks + ["Rrb"] * numrbrocks
+    numrburocks = int(input("Enter number of any/or all color rocks: "))
+
+    deck = ["lu"] * numulands + ["lb"] * numblands + ["lbu"] * numbulands + ["lr"] * numrlands + ["lru"] * numrulands + ["lrb"] * numrblands + ["lrbu"] * numrbulands + ["Ru"] * numurocks + ["Rb"] * numbrocks + ["Rbu"] * numburocks + ["Rr"] * numrrocks + ["Rru"] * numrurocks + ["Rrb"] * numrbrocks + ["Rrbu"] * numrburocks
     deck += ["c"] * (100 - len(deck))
 
     def simdeal():
