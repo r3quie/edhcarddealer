@@ -73,9 +73,9 @@ def mainthree():
         for i in range(len(hand)):
             if "u" in hand[i]:
                 blue += 1
-            elif "b" in hand[i]:
+            if "b" in hand[i]:
                 black += 1
-            elif "r" in hand[i]:
+            if "r" in hand[i]:
                 red += 1  
         
         # rest = hand.count("c")
