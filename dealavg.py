@@ -50,7 +50,7 @@ def mainthree():
 
     def simdeal():
         hand = random.sample(deck, 7)
-        
+        print(hand)
         ulands = hand.count("lu")
         blands = hand.count("lb")
         rlands = hand.count("lr")
@@ -65,24 +65,34 @@ def mainthree():
         burocks = hand.count("Rbu")
         rurocks = hand.count("Rru")
         rbrocks = hand.count("Rrb")
+
+        blue = red = black = 0
+        for i in range(len(hand)):
+            if "u" in hand[i]:
+                blue += 1
+            elif "b" in hand[i]:
+                black += 1
+            elif "r" in hand[i]:
+                red += 1  
         
         rest = hand.count("c")
-        return ulands, blands, rlands, bulands, rulands, rblands, rbulands, urocks, brocks, rrocks, burocks, rurocks, rbrocks, rest
+        # return ulands, blands, rlands, bulands, rulands, rblands, rbulands, urocks, brocks, rrocks, burocks, rurocks, rbrocks, rest, blue, red, black
+        return blue, red, black
 ################################################################################## UNFINISHED UNDER THIS LINE ##################################################################################
-    totallands = totalrocks = totalrest = 0
+    totalblue = totalred = totalblack = 0
     for _ in range(numofsim):
-        lands, rocks, rest = simdeal()
-        totallands += lands
-        totalrocks += rocks
-        totalrest += rest
+        blue, red, black = simdeal()
+        totalblue += blue
+        totalred += red
+        totalblack += black
 
-    avg_lands = totallands / numofsim
-    avg_rocks = totalrocks / numofsim
-    avg_mana = (totallands + totalrocks) / numofsim
+    avg_blue = totalblue / numofsim
+    avg_red = totalred / numofsim
+    avg_black = totalblack / numofsim
 
-    print("Avg number of lands:", avg_lands)
-    print("Avg number of manarocks:", avg_rocks)
-    print("Avg number of mana cards:", avg_mana)
+    print("Avg number of blue mana cards:", avg_blue)
+    print("Avg number of red mana cards:", avg_red)
+    print("Avg number of black mana cards:", avg_black)
 
 if __name__ == "__main__":
     if input("(m)anavalue or (c)olor mana value?\n") == "c":
