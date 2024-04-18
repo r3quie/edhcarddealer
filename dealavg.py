@@ -28,6 +28,7 @@ def main():
     print("Avg number of manarocks:", avg_rocks)
     print("Avg number of mana cards:", avg_mana)
 
+# Add desert type mana
 def mainthree():
     numofsim = int(input("Enter number of simulations: \n"))
     
