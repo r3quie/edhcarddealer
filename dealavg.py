@@ -53,21 +53,6 @@ def mainthree():
 
     def simdeal():
         hand = random.sample(deck, 7)
-        ####print(hand)
-        #ulands = hand.count("lu")
-        #blands = hand.count("lb")
-        #rlands = hand.count("lr")
-        #bulands = hand.count("lbu")
-        #rulands = hand.count("lru")
-        #rblands = hand.count("lrb")
-        #rbulands = hand.count("lrbu")
-        
-        #urocks = hand.count("Ru")
-        #brocks = hand.count("Rb")
-        #rrocks = hand.count("Rr")
-        #burocks = hand.count("Rbu")
-        #rurocks = hand.count("Rru")
-        #rbrocks = hand.count("Rrb")
 
         blue = red = black = 0
         for i in range(len(hand)):
