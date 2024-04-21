@@ -2,7 +2,7 @@ import random
 from edhapi import api_handle
 from localbulk import get_values
 
-######################################## UNDER CONSTRUCTION ########################################
+######################################### UNDER CONSTRUCTION #########################################
 
 def main():
     numofsim = int(input("Enter number of simulations: \n"))
