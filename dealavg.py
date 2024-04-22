@@ -1,8 +1,9 @@
 import random
-from edhapi import api_handle
-from localbulk import get_values
+#from edhapi import api_handle
+from localbulk import get_values, scryjson
+from getdeck import get_deck, imported_deck
 
-######################################### UNDER CONSTRUCTION #########################################
+######################################### IGNORE THIS FILE #########################################
 
 def main():
     numofsim = int(input("Enter number of simulations: \n"))
@@ -81,20 +82,10 @@ def mainthree():
     avg_blue = totalblue / numofsim
     avg_red = totalred / numofsim
     avg_black = totalblack / numofsim
-
+    print(deck)
     print("Avg number of blue mana cards:", avg_blue)
     print("Avg number of red mana cards:", avg_red)
     print("Avg number of black mana cards:", avg_black)
-
-api_handle(card_id)
-
-def import_three():
-    u_deck = input("Moxfield card deck:\n")
-    api_handle(card_id)
-
-
-
-
 
 if __name__ == "__main__":
     if input("(m)anavalue or (c)olor mana value?\n") == "c":
