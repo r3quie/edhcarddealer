@@ -3,6 +3,28 @@ import random
 from localbulk import get_values, scryjson
 from getdeck import get_deck, imported_deck
 
+def simdeal(deck):
+    hand = random.sample(deck, 7)
+
+    blue = red = black = green = white = cless = 0
+    for ii in range(len(hand)):
+        if "U" in hand[ii]:
+            blue += 1
+        if "B" in hand[ii]:
+            black += 1
+        if "R" in hand[ii]:
+            red += 1
+        if "G" in hand[ii]:
+            green += 1
+        if "W" in hand[ii]:
+            white += 1
+        if "C" in hand[ii]:
+            cless += 1
+
+    rest = hand.count("n")
+
+    return blue, red, black, green, white, cless, rest
+
 def main(numofsim):
     deck = []
     deckl, cardcount = get_deck(imported_deck)
@@ -15,31 +37,9 @@ def main(numofsim):
             card = "".join(m_value)
         deck += [card] * cardcount[i]
 
-    def simdeal():
-        hand = random.sample(deck, 7)
-
-        blue = red = black = green = white = cless = 0
-        for ii in range(len(hand)):
-            if "U" in hand[ii]:
-                blue += 1
-            if "B" in hand[ii]:
-                black += 1
-            if "R" in hand[ii]:
-                red += 1
-            if "G" in hand[ii]:
-                green += 1
-            if "W" in hand[ii]:
-                white += 1
-            if "C" in hand[ii]:
-                cless += 1
-
-        rest = hand.count("n")
-
-        return blue, red, black, green, white, cless, rest
-
     totalblue = totalred = totalblack = totalgreen = totalwhite = totalcless = totalrest = 0
     for _ in range(numofsim):
-        blue, red, black, green, white, cless, rest = simdeal()
+        blue, red, black, green, white, cless, rest = simdeal(deck)
         totalblue += blue
         totalred += red
         totalblack += black
