@@ -1,6 +1,6 @@
 import json
 
-with open("cache/oracle-cards-20240419090153.json", "r", encoding="utf8") as f:
+with open("cache/oracle-cards.json", "r", encoding="utf8") as f:
     scryjson =json.load(f)
 
 def get_values(cardname):
