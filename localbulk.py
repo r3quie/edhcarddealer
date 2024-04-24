@@ -1,6 +1,8 @@
 import json
+import os
 
-with open("cache/oracle-cards.json", "r", encoding="utf8") as f:
+print(os.getcwd())
+with open("/home/superadmin/gitrepos/edhcarddealer/cache/oracle-cards.json", "r", encoding="utf8") as f:
     scryjson =json.load(f)
 
 def get_values(cardname):

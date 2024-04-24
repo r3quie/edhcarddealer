@@ -1,7 +1,7 @@
 import random
 #from edhapi import api_handle
-from localbulk import get_values, scryjson
-from getdeck import get_deck, imported_deck
+from .localbulk import get_values, scryjson
+from .getdeck import get_deck, imported_deck
 
 ######################################### IGNORE THIS FILE #########################################
 
