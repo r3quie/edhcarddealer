@@ -94,7 +94,7 @@ imported_deck = """1 Aarakocra Sneak
 
 ## THIS CODE IS SHIT
 def get_deck(imported_deck):
-    lines = imported_deck.split("\n")  # Split input into lines
+    lines = imported_deck.split("\r\n")  # Split input into lines
     modified_lines = []  # To store modified lines
     removed_numbers = []  # To store removed numbers
 
