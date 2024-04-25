@@ -48,15 +48,15 @@ def main(numofsim, imported_deck):
         totalcless += cless
         totalrest += rest
 
-    avg_blue = str(totalblue / numofsim)
-    avg_red = str(totalred / numofsim)
-    avg_black = str(totalblack / numofsim)
-    avg_green = str(totalgreen / numofsim)
-    avg_white = str(totalwhite / numofsim)
-    avg_cless = str(totalcless / numofsim)
-    avg_rest = str(7 - totalrest / numofsim)
+    avg_blue = str(round(totalblue / numofsim, 2))
+    avg_red = str(round(totalred / numofsim, 2))
+    avg_black = str(round(totalblack / numofsim, 2))
+    avg_green = str(round(totalgreen / numofsim, 2))
+    avg_white = str(round(totalwhite / numofsim, 2))
+    avg_cless = str(round(totalcless / numofsim, 2))
+    avg_rest = str(round((7 - totalrest / numofsim), 2))
 
-    return str("Avg number of blue mana cards: " + avg_blue + "\nAvg number of red mana cards: " + avg_red + "\nAvg number of black mana cards: " + avg_black + "\nAvg number of green mana cards: " + avg_green + "\nAvg number of white mana cards: " + avg_white + "\nAvg number of colorless mana cards: " + avg_cless + "\nAvg number of mana generating cards cards: " + avg_rest)
+    return [avg_blue, avg_red, avg_black, avg_green, avg_white, avg_cless, avg_rest]
 
 if __name__ == "__main__":
     main(int(input("Enter number of simulations: ")))
