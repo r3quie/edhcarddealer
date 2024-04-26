@@ -3,11 +3,6 @@ import random
 from .localbulk import get_values, scryjson
 from .getdeck import get_deck
 
-def exampledeck():
-    from .getdeck import imported_deck
-    imported_deck = """"""" + imported deck + """""""
-    return imported_deck
-
 def simdeal(deck):
     hand = random.sample(deck, 7)
 
