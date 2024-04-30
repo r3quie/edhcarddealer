@@ -21,5 +21,12 @@ def api_handle(card_id):
     except requests.RequestException as e:
         pass
 
+def get_uri():
+    response = requests.get('https://api.scryfall.com/bulk-data/oracle-cards')
+    uri = response.json()['download_uri']
+    print(uri)
+    return uri
+
+
 if __name__ == "__main__":
-    api_handle(input("Card ID: "))
+    get_uri()
