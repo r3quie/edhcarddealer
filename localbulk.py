@@ -1,8 +1,9 @@
 import json
+from pathlib import Path
 #import os
 
 #print(os.getcwd()) #prints working pwd, needed to se correct relative path in open fnc
-with open("/home/superadmin/site/mtg/mana_calc/edhcarddealer/cache/oracle-cards.json", "r", encoding="utf8") as f:
+with open(str(Path.home()) + "/site/mtg/mana_calc/edhcarddealer/cache/oracle-cards.json", "r", encoding="utf8") as f:
     scryjson =json.load(f)
 
 def get_values(cardname):
