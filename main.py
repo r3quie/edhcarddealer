@@ -69,7 +69,6 @@ def main(numofsim, imported_deck):
     avg_cless = str(round(totalcless / numofsim, 2))
     avg_rest = str(round((7 - totalrest / numofsim), 2))
 
-    print(deck_identity)
     return [avg_blue, avg_red, avg_black, avg_green, avg_white, avg_cless, avg_rest, len(deck), deck_identity]
 
 if __name__ == "__main__":
