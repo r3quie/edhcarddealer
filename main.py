@@ -29,15 +29,14 @@ def main(numofsim, imported_deck):
     deck = []
     deck_identity = []
     deckl, cardcount = get_deck(imported_deck)
-    command_tower = False
+    commander_count = 0
 
     for i in range(len(deckl)):
-        card_in_deckl = deckl[i]
-        if command_tower is False:
-            if card_in_deckl == "Command Tower":
-                command_tower = True
-                continue
-        m_value, card_identity = get_values(card_in_deckl)
+        m_value, card_identity, commander_mana = get_values(deckl[i])
+
+        if commander_mana is True:
+            commander_count += cardcount[i]
+            continue
         if m_value == None:
             card = "n"
         else:
@@ -46,8 +45,8 @@ def main(numofsim, imported_deck):
         deck_identity += [color for color in card_identity if color not in deck_identity]
 
     deck_identity = "".join(deck_identity)
-    if command_tower is True:
-        deck += [deck_identity]
+    
+    deck += [deck_identity] * commander_count
 
 
     totalblue = totalred = totalblack = totalgreen = totalwhite = totalcless = totalrest = 0

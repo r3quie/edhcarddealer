@@ -12,17 +12,26 @@ except FileNotFoundError:
         scryjson = json.load(f)
 
 def get_values(cardname):
+    commander_mana = False
     for i in scryjson:
         if i["name"] == cardname:
             try:
                 produced_mana = i["produced_mana"]
             except KeyError:
                 produced_mana = None
+
             try:
                 color_identity = i["color_identity"]
             except KeyError:
                 color_identity = None
-            return produced_mana, color_identity
+
+            try:
+                if "dd one mana of any color in your commander's color identity" in i["oracle_text"]:
+                    commander_mana = True
+            except KeyError:
+                pass
+
+            return produced_mana, color_identity, commander_mana
 
 
 if __name__ == "__main__":
