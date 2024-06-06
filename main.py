@@ -1,6 +1,6 @@
 import random
 #from edhapi import api_handle
-from .localbulk import get_values, scryjson
+from .localbulk import get_values
 from .getdeck import get_deck
 
 def simdeal(deck):
@@ -27,15 +27,28 @@ def simdeal(deck):
 
 def main(numofsim, imported_deck):
     deck = []
+    deck_identity = []
     deckl, cardcount = get_deck(imported_deck)
+    command_tower = False
 
     for i in range(len(deckl)):
-        m_value = get_values(deckl[i])
+        card_in_deckl = deckl[i]
+        if command_tower is False:
+            if card_in_deckl == "Command Tower":
+                command_tower = True
+                continue
+        m_value, card_identity = get_values(card_in_deckl)
         if m_value == None:
             card = "n"
         else:
             card = "".join(m_value)
         deck += [card] * cardcount[i]
+        deck_identity += [color for color in card_identity if color not in deck_identity]
+
+    deck_identity = "".join(deck_identity)
+    if command_tower is True:
+        deck += [deck_identity]
+
 
     totalblue = totalred = totalblack = totalgreen = totalwhite = totalcless = totalrest = 0
     for _ in range(numofsim):
@@ -56,7 +69,9 @@ def main(numofsim, imported_deck):
     avg_cless = str(round(totalcless / numofsim, 2))
     avg_rest = str(round((7 - totalrest / numofsim), 2))
 
-    return [avg_blue, avg_red, avg_black, avg_green, avg_white, avg_cless, avg_rest, len(deck)]
+    print(deck_identity)
+    return [avg_blue, avg_red, avg_black, avg_green, avg_white, avg_cless, avg_rest, len(deck), deck_identity]
 
 if __name__ == "__main__":
-    main(int(input("Enter number of simulations: ")))
+    from getdeck import imported_deck
+    print(main(int(input("Enter number of simulations: ")), imported_deck))

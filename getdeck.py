@@ -39,7 +39,7 @@ imported_deck = """1 Aarakocra Sneak\r
 1 Lizard Blades\r
 1 Mechanized Production\r
 1 Midnight Clock\r
-4 Mountainv
+4 Mountain\r
 1 Negate\r
 1 Nightscape Familiar\r
 1 Palace Siege\r
