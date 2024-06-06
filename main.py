@@ -48,7 +48,6 @@ def main(numofsim, imported_deck):
     
     deck += [deck_identity] * commander_count
 
-
     totalblue = totalred = totalblack = totalgreen = totalwhite = totalcless = totalrest = 0
     for _ in range(numofsim):
         blue, red, black, green, white, cless, rest = simdeal(deck)
