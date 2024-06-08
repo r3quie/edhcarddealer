@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from functools import lru_cache
 #import os
 
 #print(os.getcwd()) #prints working pwd, needed to se correct relative path in open fnc
@@ -11,6 +12,7 @@ except FileNotFoundError:
     with open(str(Path.home()) + "/gitrepos/edhcarddealer/cache/oracle-cards.json", "r", encoding="utf8") as f:
         scryjson = json.load(f)
 
+@lru_cache(maxsize=200)
 def get_values(cardname):
     commander_mana = False
     for i in scryjson:
