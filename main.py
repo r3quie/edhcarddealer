@@ -127,7 +127,7 @@ def shuffle_mana_main(imported_deck):
     blue, red, black, green, white, cless, rest = true_simdeal(deck)
 
 
-    return [blue, red, black, green, white, cless, rest, len(deck), deck_identity, deckl[:7], img_uris[:7]]
+    return [blue, red, black, green, white, cless, rest, len(deck), deck_identity, img_uris[:7]]
 
 if __name__ == "__main__":
     from getdeck import imported_deck
