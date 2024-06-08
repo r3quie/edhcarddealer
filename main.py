@@ -104,10 +104,11 @@ def make_true_deck(imported_deck):
 def shuffle_mana_main(imported_deck):
     deck = []
     deck_identity = []
+    img_uris = []
     deckl = make_true_deck(imported_deck)
 
     for i in range(len(deckl)):
-        m_value, card_identity, commander_mana = get_values(deckl[i])
+        m_value, card_identity, commander_mana, img_uri = get_values(deckl[i], img=True)
 
         if commander_mana is True:
             card = "co"
@@ -117,6 +118,7 @@ def shuffle_mana_main(imported_deck):
             card = "".join(m_value)
         deck += [card]
         deck_identity += [color for color in card_identity if color not in deck_identity]
+        img_uris.append(img_uri)
 
     deck_identity = "".join(deck_identity)
     
@@ -125,7 +127,7 @@ def shuffle_mana_main(imported_deck):
     blue, red, black, green, white, cless, rest = true_simdeal(deck)
 
 
-    return [blue, red, black, green, white, cless, rest, len(deck), deck_identity, deckl[:7]]
+    return [blue, red, black, green, white, cless, rest, len(deck), deck_identity, deckl[:7], img_uris[:7]]
 
 if __name__ == "__main__":
     from getdeck import imported_deck

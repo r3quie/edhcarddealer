@@ -2,7 +2,7 @@
 
 def riffle(deck): # returns a list of indexes that are the result of a perfect riffle shuffle
     indexes = range(len(deck))
-    return [x for t in zip(indexes[:-len(indexes)//2], indexes[len(indexes)//2:]) for x in t]
+    return [x for t in zip(indexes[len(indexes)//2:], indexes[:-len(indexes)//2]) for x in t]
 
 def arrange(deck): # rearanges the deck according to the indexes
     return [deck[i] for i in riffle(deck)]
@@ -14,7 +14,7 @@ def put_hand_on_bottom(deck):
 
 
 if __name__ == "__main__":
-    deck = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    deck = [*range(100)]
     print(riffle(deck))
     print(arrange(deck))
     print(put_hand_on_bottom(deck))

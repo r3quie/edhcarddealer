@@ -13,7 +13,7 @@ except FileNotFoundError:
         scryjson = json.load(f)
 
 @lru_cache(maxsize=200)
-def get_values(cardname):
+def get_values(cardname, img=False):
     commander_mana = False
     for i in scryjson:
         if i["name"] == cardname:
@@ -33,6 +33,12 @@ def get_values(cardname):
             except KeyError:
                 pass
 
+            if img:
+                try:
+                    img = i["image_uris"]["normal"]
+                except KeyError:
+                    img = None
+                return produced_mana, color_identity, commander_mana, img
             return produced_mana, color_identity, commander_mana
 
 
