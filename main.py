@@ -1,8 +1,8 @@
 import random
 #from edhapi import api_handle
-from localbulk import get_values
-from getdeck import get_deck
-from mulligan import riffle, arrange
+from .localbulk import get_values
+from .getdeck import get_deck
+from .mulligan import riffle, arrange
 
 def simdeal(deck):
     hand = random.sample(deck, 7)
