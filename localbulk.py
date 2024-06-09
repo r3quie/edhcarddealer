@@ -35,12 +35,17 @@ def get_values(cardname, img=False):
 
             if img:
                 try:
-                    img = i["image_uris"]["normal"]
+                    imguri = [i["image_uris"]["normal"]]
                 except KeyError:
-                    img = None
-                return produced_mana, color_identity, commander_mana, img
+                    imguri = [None]
+
+                try:
+                    imguri += [i["scryfall_uri"]]
+                except KeyError:
+                    imguri += [None]
+                return produced_mana, color_identity, commander_mana, imguri
             return produced_mana, color_identity, commander_mana
 
 
 if __name__ == "__main__":
-    print(get_values("Obeka, Splitter of Seconds"))
+    print(get_values("Obeka, Splitter of Seconds", img=True))
