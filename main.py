@@ -1,8 +1,8 @@
 import random
 #from edhapi import api_handle
-from .localbulk import get_values
-from .getdeck import get_deck
-from .mulligan import riffle, arrange
+from localbulk import get_values
+from getdeck import get_deck
+from mulligan import riffle, arrange
 
 def simdeal(deck):
     hand = random.sample(deck, 7)
@@ -131,6 +131,9 @@ def shuffle_mana_main(imported_deck):
 
 if __name__ == "__main__":
     from getdeck import imported_deck
-    #print(main(int(input("Enter number of simulations: ")), imported_deck))
+    import time
+    start = time.time()
+    print(main(1000000, imported_deck))
+    print((time.time() - start)*1000, "ms")
     #print(make_true_deck(imported_deck))
-    print(shuffle_mana_main(imported_deck))
+    #print(shuffle_mana_main(imported_deck))
