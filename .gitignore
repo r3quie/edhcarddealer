@@ -2,3 +2,4 @@ cache/
 .gitignore
 __pycache__/
 *.exe
+*.pyc
