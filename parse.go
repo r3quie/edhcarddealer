@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"math/rand"
 	"os"
@@ -31,7 +30,15 @@ type Card struct {
 
 type Cards []Card
 
-var cards = parseCards()
+type Result struct {
+	U, R, B, G, W, C, Non int
+}
+
+type Results struct {
+	U, R, B, G, W, C, Non float64
+}
+
+var cards = parseCards("cache/oracle-cards.json")
 
 /*
 	type DCard struct {
@@ -41,25 +48,52 @@ var cards = parseCards()
 
 type Deck []DCard
 */
-func parseCards() Cards {
-	// Open the file
-	jsonFile, err := os.Open("cache/oracle-cards.json")
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer jsonFile.Close()
 
-	byteValue, _ := io.ReadAll(jsonFile)
+// Add adds values of r2 to r
+func (r *Result) Add(r2 Result) {
+	r.U += r2.U
+	r.R += r2.R
+	r.B += r2.B
+	r.G += r2.G
+	r.W += r2.W
+	r.C += r2.C
+	r.Non += r2.Non
+}
+
+// Returns the average of the Result
+func (r Result) Average(n int) Results {
+	return Results{
+		U:   float64(r.U) / float64(n),
+		R:   float64(r.R) / float64(n),
+		B:   float64(r.B) / float64(n),
+		G:   float64(r.G) / float64(n),
+		W:   float64(r.W) / float64(n),
+		C:   float64(r.C) / float64(n),
+		Non: float64(r.Non) / float64(n),
+	}
+}
+
+func (r Results) String() string {
+	return fmt.Sprintf("U: %.2f\nR: %.2f\nB: %.2f\nG: %.2f\nW: %.2f\nC: %.2f\nNon: %.2f\n", r.U, r.R, r.B, r.G, r.W, r.C, r.Non)
+}
+
+func parseCards(path string) Cards {
+	// Open the file
+	f, err := os.ReadFile(path)
+	if err != nil {
+		panic(err)
+	}
 
 	var cs Cards
 
-	if err := json.Unmarshal(byteValue, &cs); err != nil {
+	if err := json.Unmarshal(f, &cs); err != nil {
 		log.Println(err)
 	}
 	return cs
 }
 
-func getValue(cardName string) (Card, error) {
+// takes a card name and returns the card struct from the cards slice
+func getCard(cardName string) (Card, error) {
 	for _, card := range cards {
 		if card.Name == cardName {
 			return card, nil
@@ -68,6 +102,7 @@ func getValue(cardName string) (Card, error) {
 	return Card{}, fmt.Errorf("Card not found")
 }
 
+// takes a string of cards for MTGO and returns Cards
 func getDeck(input string) Cards {
 	lines := strings.Split(input, "\r\n")
 
@@ -80,16 +115,12 @@ func getDeck(input string) Cards {
 		if len(match) == 3 {
 			count := match[1]
 			cardName := match[2]
-			var countint int
-			if x, err := strconv.Atoi(count); err != nil {
-				countint = 1
-			} else {
-				countint = x
-			}
-			x, err := getValue(cardName)
+
+			countint, _ := strconv.Atoi(count)
+
+			x, err := getCard(cardName)
 			if err != nil {
 				log.Println(err)
-				deck = deck[:len(deck)-countint]
 				continue
 			}
 			for k := 0; k < countint; k++ {
@@ -101,175 +132,71 @@ func getDeck(input string) Cards {
 	return deck
 }
 
-func simdeal(deck Cards) struct{ U, R, B, G, W, C, Non int } {
+func simdeal(deck Cards) Result {
 	hand := make(Cards, 7)
 	for i := range hand {
 		hand[i] = deck[rand.Intn(len(deck))]
 	}
 
-	blue, red, black, green, white, cless, non := 0, 0, 0, 0, 0, 0, 0
+	var result Result
+
 	for _, card := range hand {
 		if card.ProducedMana == nil {
-			non++
+			result.Non++
 			continue
 		}
 		for _, color := range card.ProducedMana {
 			switch color {
 			case "U":
-				blue++
+				result.U++
 			case "R":
-				red++
+				result.R++
 			case "B":
-				black++
+				result.B++
 			case "G":
-				green++
+				result.G++
 			case "W":
-				white++
+				result.W++
 			case "C":
-				cless++
+				result.C++
 			}
 		}
 	}
-	return struct {
-		U   int
-		R   int
-		B   int
-		G   int
-		W   int
-		C   int
-		Non int
-	}{blue, red, black, green, white, cless, non}
+	return result
 }
 
-func simulate(deck Cards, n int) struct{ U, R, B, G, W, C, Non float64 } {
-
-	total := struct{ U, R, B, G, W, C, Non int }{}
-	avg_results := struct{ U, R, B, G, W, C, Non float64 }{}
-
-	for i := 0; i < n; i++ {
-		results := simdeal(deck)
-		total.U += results.U
-		total.R += results.R
-		total.B += results.B
-		total.G += results.G
-		total.W += results.W
-		total.C += results.C
-		total.Non += results.Non
+func simulate(deck Cards, n int) Results {
+	if n > 1000000 {
+		n = 1000000
+	}
+	if n < 1 {
+		n = 1
 	}
 
-	avg_results.U = float64(total.U) / float64(n)
-	avg_results.R = float64(total.R) / float64(n)
-	avg_results.B = float64(total.B) / float64(n)
-	avg_results.G = float64(total.G) / float64(n)
-	avg_results.W = float64(total.W) / float64(n)
-	avg_results.C = float64(total.C) / float64(n)
-	avg_results.Non = float64(total.Non) / float64(n)
+	var total Result
+
+	for i := 0; i < n; i++ {
+		total.Add(simdeal(deck))
+	}
+
+	avg_results := total.Average(n)
 
 	return avg_results
 }
 
 func main() {
 	x := time.Now()
-	deck := getDeck(`1 Aarakocra Sneak` + "\r" + `
-1 Access Tunnel` + "\r" + `
-1 Aether Tunnel` + "\r" + `
-1 Ancestral Vision` + "\r" + `
-1 Aqueous Form` + "\r" + `
-1 As Foretold` + "\r" + `
-1 Baleful Mastery` + "\r" + `
-1 Blackblade Reforged` + "\r" + `
-1 Blasphemous Act` + "\r" + `
-1 Bojuka Bog` + "\r" + `
-1 Braids, Conjurer Adept` + "\r" + `
-1 Cascade Bluffs` + "\r" + `
-1 Caves of Chaos Adventurer` + "\r" + `
-1 Chaos Warp` + "\r" + `
-1 Command Tower` + "\r" + `
-1 Counterspell` + "\r" + `
-1 Court of Ire` + "\r" + `
-1 Creeping Bloodsucker` + "\r" + `
-1 Crumbling Necropolis` + "\r" + `
-1 Darkwater Catacombs` + "\r" + `
-1 Defabricate` + "\r" + `
-1 Descent into Avernus` + "\r" + `
-1 Dimir Signet` + "\r" + `
-1 Dragonmaster Outcast` + "\r" + `
-1 Dragonskull Summit` + "\r" + `
-1 Drowned Catacomb` + "\r" + `
-1 Endless Evil` + "\r" + `
-1 Exotic Orchard` + "\r" + `
-1 Feed the Swarm` + "\r" + `
-1 Feywild Caretaker` + "\r" + `
-1 Gate to the Aether` + "\r" + `
-1 Indulgent Tormentor` + "\r" + `
-1 Infernal Grasp` + "\r" + `
-1 Inspiring Refrain` + "\r" + `
-6 Island` + "\r" + `
-1 Izzet Signet` + "\r" + `
-1 Kumena's Awakening` + "\r" + `
-1 Lizard Blades` + "\r" + `
-1 Mechanized Production` + "\r" + `
-1 Midnight Clock` + "\r" + `
-4 Mountain` + "\r" + `
-1 Negate` + "\r" + `
-1 Nightscape Familiar` + "\r" + `
-1 Palace Siege` + "\r" + `
-1 Passageway Seer` + "\r" + `
-1 Path of Ancestry` + "\r" + `
-1 Phyrexian Arena` + "\r" + `
-1 Plargg and Nassari` + "\r" + `
-1 Profane Tutor` + "\r" + `
-1 Protection Racket` + "\r" + `
-1 Rakdos Signet` + "\r" + `
-1 Ravenloft Adventurer` + "\r" + `
-1 Reliquary Tower` + "\r" + `
-1 Replicating Ring` + "\r" + `
-1 Rilsa Rael, Kingpin` + "\r" + `
-1 Ring of Evos Isle` + "\r" + `
-1 Ring of Valkas` + "\r" + `
-1 Ring of Xathrid` + "\r" + `
-1 Rogue's Passage` + "\r" + `
-1 Rousing Refrain` + "\r" + `
-1 Shivan Reef` + "\r" + `
-1 Skyline Despot` + "\r" + `
-1 Smoldering Marsh` + "\r" + `
-1 Sphinx of the Second Sun` + "\r" + `
-1 Star Whale` + "\r" + `
-1 Stirring Bard` + "\r" + `
-1 Stolen Strategy` + "\r" + `
-1 Sulfur Falls` + "\r" + `
-1 Sulfurous Springs` + "\r" + `
-1 Sunken Hollow` + "\r" + `
-2 Swamp` + "\r" + `
-1 Swiftfoot Boots` + "\r" + `
-1 Sword Coast Sailor` + "\r" + `
-1 Talisman of Creativity` + "\r" + `
-1 Talisman of Dominance` + "\r" + `
-1 Talisman of Indulgence` + "\r" + `
-1 Tavern Brawler` + "\r" + `
-1 Temple of Deceit` + "\r" + `
-1 Temple of Epiphany` + "\r" + `
-1 Temple of Malice` + "\r" + `
-1 Thassa, God of the Sea` + "\r" + `
-1 The Ninth Doctor` + "\r" + `
-1 The Tenth Doctor` + "\r" + `
-1 Thopter Spy Network` + "\r" + `
-1 Tomb of Horrors Adventurer` + "\r" + `
-1 Twilight Prophet` + "\r" + `
-1 Underground River` + "\r" + `
-1 Vandalblast` + "\r" + `
-1 Wheel of Fate` + "\r" + `
-1 Whispersilk Cloak` + "\r" + `
-1 Obeka, Splitter of Seconds`)
 
-	result := simulate(deck, 1000000)
-	fmt.Printf("Average Blue: %f\n", result.U)
-	fmt.Printf("Average Red: %f\n", result.R)
-	fmt.Printf("Average Black: %f\n", result.B)
-	fmt.Printf("Average Green: %f\n", result.G)
-	fmt.Printf("Average White: %f\n", result.W)
-	fmt.Printf("Average Colorless: %f\n", result.C)
-	fmt.Printf("Average Generating cards: %f\n", 7-result.Non)
+	f, err := os.ReadFile("cache/deck.txt")
+	if err != nil {
+		panic(err)
+	}
+
+	deck := getDeck(string(f))
+
+	result := simulate(deck, 10000000)
+
+	fmt.Println(result.String())
 
 	fmt.Println(time.Since(x))
 }
