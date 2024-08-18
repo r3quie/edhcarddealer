@@ -60,6 +60,11 @@ func (r *Result) Add(r2 Result) {
 	r.Non += r2.Non
 }
 
+type Deck struct {
+	Cards         []Card
+	ColorIdentity []any
+}
+
 // Returns the average of the Result
 func (r Result) Average(n int) Results {
 	return Results{
@@ -103,10 +108,11 @@ func getCard(cardName string) (Card, error) {
 }
 
 // takes a string of cards for MTGO and returns Cards
-func getDeck(input string) Cards {
+func getDeck(input string) Deck {
+
 	lines := strings.Split(input, "\r\n")
 
-	var deck Cards
+	var deck Deck
 
 	re := regexp.MustCompile(`^(\d+)\s+(.*)$`)
 
@@ -123,8 +129,11 @@ func getDeck(input string) Cards {
 				log.Println(err)
 				continue
 			}
+			if len(deck.ColorIdentity) < len(x.ColorIdentity) {
+				deck.ColorIdentity = x.ColorIdentity
+			}
 			for k := 0; k < countint; k++ {
-				deck = append(deck, x)
+				deck.Cards = append(deck.Cards, x)
 			}
 		}
 	}
@@ -132,20 +141,16 @@ func getDeck(input string) Cards {
 	return deck
 }
 
-func simdeal(deck Cards) Result {
+func simdeal(deck Deck) Result {
 	hand := make(Cards, 7)
 	for i := range hand {
-		hand[i] = deck[rand.Intn(len(deck))]
+		hand[i] = deck.Cards[rand.Intn(len(deck.Cards))]
 	}
 
 	var result Result
 
-	for _, card := range hand {
-		if card.ProducedMana == nil {
-			result.Non++
-			continue
-		}
-		for _, color := range card.ProducedMana {
+	count := func(ProducedMana []any) {
+		for _, color := range ProducedMana {
 			switch color {
 			case "U":
 				result.U++
@@ -162,10 +167,30 @@ func simdeal(deck Cards) Result {
 			}
 		}
 	}
+
+	for _, card := range hand {
+		if card.ProducedMana == nil {
+			result.Non++
+			continue
+		}
+		if strings.Contains(card.OracleText, "dd one mana of any color in your commander's color identity") {
+			count(deck.ColorIdentity)
+			continue
+		}
+		count(card.ProducedMana)
+	}
 	return result
 }
 
-func simulate(deck Cards, n int) Results {
+func simulate(n int) Results {
+
+	f, err := os.ReadFile("cache/deck.txt")
+	if err != nil {
+		panic(err)
+	}
+
+	deck := getDeck(string(f))
+
 	if n > 1000000 {
 		n = 1000000
 	}
@@ -187,14 +212,7 @@ func simulate(deck Cards, n int) Results {
 func main() {
 	x := time.Now()
 
-	f, err := os.ReadFile("cache/deck.txt")
-	if err != nil {
-		panic(err)
-	}
-
-	deck := getDeck(string(f))
-
-	result := simulate(deck, 10000000)
+	result := simulate(10000000)
 
 	fmt.Println(result.String())
 
