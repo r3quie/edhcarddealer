@@ -12,6 +12,8 @@ import (
 	"time"
 )
 
+// PLEASE TEST IF Sscanf FASTER THAN REGEXP
+
 type Card struct {
 	Name          string `json:"name"`
 	ProducedMana  []any  `json:"produced_mana"`
