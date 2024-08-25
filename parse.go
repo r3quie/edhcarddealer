@@ -133,11 +133,31 @@ func getDeck(input string) Deck {
 	return deck
 }
 
-func simdeal(deck Deck) Result {
-	hand := make(Cards, 7)
-	for i := range hand {
-		hand[i] = deck.Cards[rand.Intn(len(deck.Cards))]
+func (cs Cards) Contains(card Card) bool {
+	for _, c := range cs {
+		if c.Name == card.Name {
+			return true
+		}
 	}
+	return false
+}
+
+func (deck Deck) DealHand() Cards {
+	hand := make(Cards, 7)
+
+	for i := range hand {
+		card := deck.Cards[rand.Intn(len(deck.Cards))]
+		for hand.Contains(card) {
+			card = deck.Cards[rand.Intn(len(deck.Cards))]
+		}
+		hand[i] = card
+	}
+
+	return hand
+}
+
+func simdeal(deck Deck) Result {
+	hand := deck.DealHand()
 
 	var result Result
 
