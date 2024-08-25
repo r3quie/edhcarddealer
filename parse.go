@@ -9,7 +9,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 )
 
 // PLEASE TEST IF Sscanf FASTER THAN REGEXP
@@ -42,15 +41,6 @@ type Results struct {
 
 var cards = parseCards("cache/oracle-cards.json")
 
-/*
-	type DCard struct {
-		Card  Card
-		Count int
-	}
-
-type Deck []DCard
-*/
-
 // Add adds values of r2 to r
 func (r *Result) Add(r2 Result) {
 	r.U += r2.U
@@ -63,7 +53,7 @@ func (r *Result) Add(r2 Result) {
 }
 
 type Deck struct {
-	Cards         []Card
+	Cards         Cards
 	ColorIdentity []any
 }
 
@@ -184,14 +174,9 @@ func simdeal(deck Deck) Result {
 	return result
 }
 
-func simulate(n int) Results {
+func simulate(decklist string, n int) Results {
 
-	f, err := os.ReadFile("cache/deck.txt")
-	if err != nil {
-		panic(err)
-	}
-
-	deck := getDeck(string(f))
+	deck := getDeck(decklist)
 
 	if n > 1000000 {
 		n = 1000000
@@ -211,12 +196,29 @@ func simulate(n int) Results {
 	return avg_results
 }
 
-func main() {
-	x := time.Now()
+func (c Cards) Riffle() {
 
-	result := simulate(10000000)
+	// using append 'cause you gotta love slices
+	first := append(Cards{}, c[len(c)/2:]...)
+	second := append(Cards{}, c[:len(c)/2]...)
 
-	fmt.Println(result.String())
+	for i := 0; i < len(c); i++ {
+		if i%2 == 0 {
+			c[i] = first[i/2]
+		} else {
+			c[i] = second[i/2]
+		}
+	}
+}
 
-	fmt.Println(time.Since(x))
+func (deck *Deck) PutHandOnBottom() {
+	deck.Cards = append(deck.Cards[len(deck.Cards)-7:], deck.Cards[:len(deck.Cards)-7]...)
+}
+
+func (c Cards) Names() []string {
+	n := make([]string, len(c))
+	for i, x := range c {
+		n[i] = x.Name
+	}
+	return n
 }
