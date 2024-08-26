@@ -88,7 +88,5 @@ func simulate(decklist string, n int) Results {
 		total.Add(simdeal(deck))
 	}
 
-	avg_results := total.Average(n)
-
-	return avg_results
+	return total.Average(n)
 }

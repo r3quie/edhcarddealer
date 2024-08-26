@@ -21,4 +21,6 @@ func parseCards(path string) Cards {
 	return cs
 }
 
-var cards = parseCards("cache/oracle-cards.json")
+var pathToCards = "cache/oracle-cards.json"
+
+var cards = parseCards(pathToCards)
