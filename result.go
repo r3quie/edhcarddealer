@@ -21,6 +21,26 @@ func (r *Result) Add(r2 Result) {
 	r.Non += r2.Non
 }
 
+// Count counts the number of each color in the mana produced by a card, uses switch case, might change to map later
+func (r *Result) Count(ProducedMana []any) {
+	for _, color := range ProducedMana {
+		switch color {
+		case "U":
+			r.U++
+		case "R":
+			r.R++
+		case "B":
+			r.B++
+		case "G":
+			r.G++
+		case "W":
+			r.W++
+		case "C":
+			r.C++
+		}
+	}
+}
+
 // Returns the average of the Result
 func (r Result) Average(n int) Results {
 	return Results{

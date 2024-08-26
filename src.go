@@ -1,29 +1,12 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
 )
-
-func parseCards(path string) Cards {
-	// Open the file
-	f, err := os.ReadFile(path)
-	if err != nil {
-		panic(err)
-	}
-
-	var cs Cards
-
-	if err := json.Unmarshal(f, &cs); err != nil {
-		log.Println(err)
-	}
-	return cs
-}
 
 // takes a card name and returns the card struct from the cards slice
 func getCard(cardName string) (Card, error) {
@@ -41,7 +24,7 @@ func getDeck(input string) Deck {
 	lines := strings.Split(input, "\r\n")
 
 	var deck Deck
-
+	// PLEASE TEST IF Sscanf FASTER THAN REGEXP
 	re := regexp.MustCompile(`^(\d+)\s+(.*)$`)
 
 	for _, line := range lines {
@@ -74,35 +57,16 @@ func simdeal(deck Deck) Result {
 
 	var result Result
 
-	count := func(ProducedMana []any) {
-		for _, color := range ProducedMana {
-			switch color {
-			case "U":
-				result.U++
-			case "R":
-				result.R++
-			case "B":
-				result.B++
-			case "G":
-				result.G++
-			case "W":
-				result.W++
-			case "C":
-				result.C++
-			}
-		}
-	}
-
 	for _, card := range hand {
 		if card.ProducedMana == nil {
 			result.Non++
 			continue
 		}
 		if strings.Contains(card.OracleText, "dd one mana of any color in your commander's color identity") {
-			count(deck.ColorIdentity)
+			result.Count(deck.ColorIdentity)
 			continue
 		}
-		count(card.ProducedMana)
+		result.Count(card.ProducedMana)
 	}
 	return result
 }
