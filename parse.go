@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func parseCards(path string) Cards {
+func ParseCards(path string) Cards {
 	// Open the file
 	f, err := os.ReadFile(path)
 	if err != nil {
@@ -21,6 +21,6 @@ func parseCards(path string) Cards {
 	return cs
 }
 
-var pathToCards = "cache/oracle-cards.json"
+var PathToCards = "cache/oracle-cards.json"
 
-var cards = parseCards(pathToCards)
+var ParsedCards = ParseCards(PathToCards)

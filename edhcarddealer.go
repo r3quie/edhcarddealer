@@ -9,8 +9,8 @@ import (
 )
 
 // takes a card name and returns the card struct from the cards slice
-func getCard(cardName string) (Card, error) {
-	for _, card := range cards {
+func GetCard(cardName string) (Card, error) {
+	for _, card := range ParsedCards {
 		if card.Name == cardName {
 			return card, nil
 		}
@@ -19,7 +19,7 @@ func getCard(cardName string) (Card, error) {
 }
 
 // takes a string of cards for MTGO and returns Cards
-func getDeck(input string) Deck {
+func GetDeck(input string) Deck {
 
 	lines := strings.Split(input, "\r\n")
 
@@ -35,7 +35,7 @@ func getDeck(input string) Deck {
 
 			countint, _ := strconv.Atoi(count)
 
-			x, err := getCard(cardName)
+			x, err := GetCard(cardName)
 			if err != nil {
 				log.Println(err)
 				continue
@@ -52,7 +52,7 @@ func getDeck(input string) Deck {
 	return deck
 }
 
-func simdeal(deck Deck) Result {
+func Simdeal(deck Deck) Result {
 	hand := deck.DealHand()
 
 	var result Result
@@ -71,9 +71,9 @@ func simdeal(deck Deck) Result {
 	return result
 }
 
-func simulate(decklist string, n int) Results {
+func Simulate(decklist string, n int) Results {
 
-	deck := getDeck(decklist)
+	deck := GetDeck(decklist)
 
 	if n > 1000000 {
 		n = 1000000
@@ -85,7 +85,7 @@ func simulate(decklist string, n int) Results {
 	var total Result
 
 	for i := 0; i < n; i++ {
-		total.Add(simdeal(deck))
+		total.Add(Simdeal(deck))
 	}
 
 	return total.Average(n)
