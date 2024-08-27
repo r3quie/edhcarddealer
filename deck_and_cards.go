@@ -1,4 +1,4 @@
-package main
+package edhcarddealer
 
 import (
 	"math/rand"
