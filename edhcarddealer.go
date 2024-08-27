@@ -21,8 +21,12 @@ func GetCard(cardName string) (Card, error) {
 // takes a string of cards for MTGO and returns Cards
 func GetDeck(input string) Deck {
 
-	lines := strings.Split(input, "\r\n")
-
+	var lines []string
+	if strings.Contains(input, "\r\n") {
+		lines = strings.Split(input, "\r\n")
+	} else {
+		lines = strings.Split(input, "\n")
+	}
 	var deck Deck
 	// PLEASE TEST IF Sscanf FASTER THAN REGEXP
 	re := regexp.MustCompile(`^(\d+)\s+(.*)$`)
