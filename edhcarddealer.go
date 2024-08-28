@@ -3,12 +3,19 @@ package edhcarddealer
 import (
 	"fmt"
 	"log"
+	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
 // takes a card name and returns the card struct from the cards slice
+
+type InputString struct {
+	Input string
+	Typ   string
+}
+
 func GetCard(cardName string) (Card, error) {
 	for _, card := range ParsedCards {
 		if card.Name == cardName {
@@ -19,14 +26,26 @@ func GetCard(cardName string) (Card, error) {
 }
 
 // takes a string of cards for MTGO and returns Cards
-func GetDeck(input string) Deck {
 
+func InputToLines(i InputString) []string {
 	var lines []string
-	if strings.Contains(input, "\r\n") {
-		lines = strings.Split(input, "\r\n")
-	} else {
-		lines = strings.Split(input, "\n")
+
+	if i.Typ == "urlencoded" {
+		if ii, err := url.QueryUnescape(i.Input); err == nil {
+			i.Input = ii
+		}
 	}
+
+	if strings.Contains(i.Input, "\r\n") {
+		lines = strings.Split(i.Input, "\r\n")
+	} else {
+		lines = strings.Split(i.Input, "\n")
+	}
+	return lines
+}
+
+func GetDeck(decklist InputString) Deck {
+	lines := InputToLines(decklist)
 	var deck Deck
 	// PLEASE TEST IF Sscanf FASTER THAN REGEXP
 	re := regexp.MustCompile(`^(\d+)\s+(.*)$`)
@@ -75,7 +94,7 @@ func Simdeal(deck Deck) Result {
 	return result
 }
 
-func Simulate(decklist string, n int) Results {
+func Simulate(decklist InputString, n int) Results {
 
 	deck := GetDeck(decklist)
 
