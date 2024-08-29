@@ -22,7 +22,7 @@ func GetCard(cardName string) (Card, error) {
 			return card, nil
 		}
 	}
-	return Card{}, fmt.Errorf("Card not found")
+	return Card{}, fmt.Errorf("Card" + cardName + "not found")
 }
 
 // takes a string of cards for MTGO and returns Cards
@@ -39,7 +39,7 @@ func InputToLines(i InputString) []string {
 	if strings.Contains(i.Input, "\r\n") {
 		lines = strings.Split(i.Input, "\r\n")
 	} else if !strings.Contains(i.Input, "\n") {
-		lines = regexp.MustCompile(`(\d+\s+\w+\s+\w+)`).FindAllString(i.Input, -1)
+		lines = regexp.MustCompile(`(\d+ [^0-9]+?)`).FindStringSubmatch(i.Input)[1:]
 		log.Println(lines)
 	} else {
 		lines = strings.Split(i.Input, "\n")
@@ -54,7 +54,7 @@ func GetDeck(decklist InputString) Deck {
 	re := regexp.MustCompile(`^(\d+)\s+(.*)$`)
 
 	for _, line := range lines {
-		match := re.FindStringSubmatch(line)
+		match := re.FindStringSubmatch(strings.TrimSpace(line))
 		if len(match) == 3 {
 			count := match[1]
 			cardName := match[2]
