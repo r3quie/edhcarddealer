@@ -36,6 +36,17 @@ func InputToLines(i InputString) []string {
 		}
 	}
 
+	if strings.Contains(i.Input, "SIDEBOARD:") {
+		i.Input = strings.ReplaceAll(i.Input, "SIDEBOARD:", " ")
+	}
+	if strings.Contains(i.Input, "COMMANDER:") {
+		i.Input = strings.ReplaceAll(i.Input, "COMMANDER:", " ")
+	}
+
+	if strings.Contains(i.Input, "  ") {
+		i.Input = strings.ReplaceAll(i.Input, "  ", " ")
+	}
+
 	if strings.Contains(i.Input, "\r\n") {
 		lines = strings.Split(i.Input, "\r\n")
 	} else if !strings.Contains(i.Input, "\n") {
