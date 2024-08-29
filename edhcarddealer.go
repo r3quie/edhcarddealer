@@ -38,6 +38,9 @@ func InputToLines(i InputString) []string {
 
 	if strings.Contains(i.Input, "\r\n") {
 		lines = strings.Split(i.Input, "\r\n")
+	} else if !strings.Contains(i.Input, "\n") {
+		lines = regexp.MustCompile(`(\d+\s+\w+\s+\w+)`).FindAllString(i.Input, -1)
+		log.Println(lines)
 	} else {
 		lines = strings.Split(i.Input, "\n")
 	}
