@@ -50,7 +50,7 @@ func InputToLines(i InputString) []string {
 	if strings.Contains(i.Input, "\r\n") {
 		lines = strings.Split(i.Input, "\r\n")
 	} else if !strings.Contains(i.Input, "\n") {
-		lines = regexp.MustCompile(`(\d+ [^0-9]+)`).FindStringSubmatch(i.Input)[1:]
+		lines = regexp.MustCompile(`(\d+ [^0-9]+)`).FindAllString(i.Input, -1)
 		log.Println(lines)
 	} else {
 		lines = strings.Split(i.Input, "\n")
@@ -125,5 +125,9 @@ func Simulate(decklist InputString, n int) Results {
 		total.Add(Simdeal(deck))
 	}
 
-	return total.Average(n)
+	result := total.Average(n)
+	result.NumberOfCards = len(deck.Cards)
+	result.ColorIdentity = deck.ColorIdentity
+
+	return result
 }

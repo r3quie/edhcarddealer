@@ -8,6 +8,8 @@ type Result struct {
 
 type Results struct {
 	U, R, B, G, W, C, Non float64
+	ColorIdentity         []any
+	NumberOfCards         int
 }
 
 // Add adds values of r2 to r
