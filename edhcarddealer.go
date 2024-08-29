@@ -22,7 +22,7 @@ func GetCard(cardName string) (Card, error) {
 			return card, nil
 		}
 	}
-	return Card{}, fmt.Errorf("Card" + cardName + "not found")
+	return Card{}, fmt.Errorf("Card " + cardName + " not found")
 }
 
 // takes a string of cards for MTGO and returns Cards
@@ -50,7 +50,7 @@ func InputToLines(i InputString) []string {
 	if strings.Contains(i.Input, "\r\n") {
 		lines = strings.Split(i.Input, "\r\n")
 	} else if !strings.Contains(i.Input, "\n") {
-		lines = regexp.MustCompile(`(\d+ [^0-9]+?)`).FindStringSubmatch(i.Input)[1:]
+		lines = regexp.MustCompile(`(\d+ [^0-9]+)`).FindStringSubmatch(i.Input)[1:]
 		log.Println(lines)
 	} else {
 		lines = strings.Split(i.Input, "\n")
