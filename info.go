@@ -100,14 +100,12 @@ func (cc CardsInfo) PurchaseUris(name string) any {
 	return nil
 }
 
-/*
 // Returns the card faces of a card in CardsInfo
-func (cc CardsInfo) CardFaces(name string) []any {
-    for _, Card := range ParsedCardsInfo {
-        if Card.Name == name {
-            return Card.CardFaces
-        }
-    }
-    return nil
+func (cc CardsInfo) CardFaces(name string) any {
+	for _, Card := range ParsedCardsInfo {
+		if Card.Name == name {
+			return Card.CardFaces
+		}
+	}
+	return nil
 }
-*/
