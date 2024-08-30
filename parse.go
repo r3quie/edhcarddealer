@@ -47,7 +47,7 @@ func DownloadOracleCards(path string) {
 	}
 }
 
-func ParseCards(path string) Cards {
+func ParseCards[T Cards | CardsInfo](path string) T {
 	// Open the file
 	var f []byte
 	for {
@@ -59,7 +59,7 @@ func ParseCards(path string) Cards {
 		f = ff
 		break
 	}
-	var cs Cards
+	var cs T
 
 	if err := json.Unmarshal(f, &cs); err != nil {
 		log.Println(err)
@@ -69,4 +69,6 @@ func ParseCards(path string) Cards {
 
 var PathToCards = "cache/oracle-cards.json"
 
-var ParsedCards = ParseCards(PathToCards)
+var ParsedCards = ParseCards[Cards](PathToCards)
+
+var ParsedCardsInfo = ParseCards[CardsInfo](PathToCards)
