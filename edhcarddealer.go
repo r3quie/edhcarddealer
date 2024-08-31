@@ -3,18 +3,12 @@ package edhcarddealer
 import (
 	"fmt"
 	"log"
-	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
 // takes a card name and returns the card struct from the cards slice
-
-type InputString struct {
-	Input string
-	Typ   string
-}
 
 func GetCard(cardName string) (Card, error) {
 	for _, card := range ParsedCards {
@@ -27,38 +21,32 @@ func GetCard(cardName string) (Card, error) {
 
 // takes a string of cards for MTGO and returns Cards
 
-func InputToLines(i InputString) []string {
+func InputToLines(i string) []string {
 	var lines []string
 
-	if i.Typ == "urlencoded" {
-		if ii, err := url.QueryUnescape(i.Input); err == nil {
-			i.Input = ii
-		}
+	if strings.Contains(i, "SIDEBOARD:") {
+		i = strings.ReplaceAll(i, "SIDEBOARD:", " ")
+	}
+	if strings.Contains(i, "COMMANDER:") {
+		i = strings.ReplaceAll(i, "COMMANDER:", " ")
 	}
 
-	if strings.Contains(i.Input, "SIDEBOARD:") {
-		i.Input = strings.ReplaceAll(i.Input, "SIDEBOARD:", " ")
-	}
-	if strings.Contains(i.Input, "COMMANDER:") {
-		i.Input = strings.ReplaceAll(i.Input, "COMMANDER:", " ")
+	if strings.Contains(i, "  ") {
+		i = strings.ReplaceAll(i, "  ", " ")
 	}
 
-	if strings.Contains(i.Input, "  ") {
-		i.Input = strings.ReplaceAll(i.Input, "  ", " ")
-	}
-
-	if strings.Contains(i.Input, "\r\n") {
-		lines = strings.Split(i.Input, "\r\n")
-	} else if !strings.Contains(i.Input, "\n") {
-		lines = regexp.MustCompile(`(\d+ [^0-9]+)`).FindAllString(i.Input, -1)
+	if strings.Contains(i, "\r\n") {
+		lines = strings.Split(i, "\r\n")
+	} else if !strings.Contains(i, "\n") {
+		lines = regexp.MustCompile(`(\d+ [^0-9]+)`).FindAllString(i, -1)
 		log.Println(lines)
 	} else {
-		lines = strings.Split(i.Input, "\n")
+		lines = strings.Split(i, "\n")
 	}
 	return lines
 }
 
-func GetDeck(decklist InputString) Deck {
+func GetDeck(decklist string) Deck {
 	lines := InputToLines(decklist)
 	var deck Deck
 	// PLEASE TEST IF Sscanf FASTER THAN REGEXP
@@ -108,7 +96,7 @@ func Simdeal(deck Deck) Result {
 	return result
 }
 
-func Simulate(decklist InputString, n int) Results {
+func Simulate(decklist string, n int) Results {
 
 	deck := GetDeck(decklist)
 
