@@ -19,7 +19,13 @@ type BulkData struct {
 func DownloadOracleCards(path string) {
 	out, err := os.Create(path)
 	if err != nil {
-		panic(err)
+		if e := os.Mkdir("cache", 0755); e != nil {
+			panic(e)
+		}
+		out, err = os.Create(path)
+		if err != nil {
+			panic(err)
+		}
 	}
 	defer out.Close()
 
