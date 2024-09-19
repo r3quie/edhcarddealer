@@ -16,6 +16,11 @@ func GetCard(cardName string) (Card, error) {
 			return card, nil
 		}
 	}
+	for _, card := range ParsedCards {
+		if strings.Contains(card.Name+" //", cardName) {
+			return card, nil
+		}
+	}
 	return Card{}, fmt.Errorf("Card " + cardName + " not found")
 }
 

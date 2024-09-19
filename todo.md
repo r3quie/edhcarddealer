@@ -1,1 +1,2 @@
-- [ ] dual cards in mtgo?
+- [x] dual cards in mtgo?
+- [ ] error signal when dual card, act accordingly, test
