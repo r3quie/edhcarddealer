@@ -1,0 +1,1 @@
+- [ ] dual cards in mtgo?
