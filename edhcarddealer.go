@@ -16,8 +16,9 @@ func GetCard(cardName string) (Card, error) {
 			return card, nil
 		}
 	}
-	for _, card := range ParsedCards {
-		if strings.Contains(card.Name+" //", cardName) {
+	for i, card := range ParsedCards {
+		if strings.Contains(card.Name, cardName+" //") {
+			card.ImgUris, card.OracleText = ParsedCardsInfo[i].CardFaces[0].ImageUris, ParsedCardsInfo[i].CardFaces[0].OracleText
 			return card, nil
 		}
 	}
