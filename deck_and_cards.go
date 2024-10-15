@@ -52,9 +52,36 @@ func (c Cards) Names() []string {
 	return n
 }
 
+func reverse(arr []Card) {
+	for i, j := 0, len(arr)-1; i < j; i, j = i+1, j-1 {
+		arr[i], arr[j] = arr[j], arr[i]
+	}
+}
+
 // PutHandOnBottom puts the top 7 cards on the bottom of the deck
 func (c *Cards) PutHandOnBottom() {
 	*c = append((*c)[len(*c)-7:], (*c)[:len(*c)-7]...)
+}
+
+func (c *Cards) PileShuffle(n int) {
+	piles := make([][]Card, n)
+	/*
+		for i := 0; i < 8; i++ {
+			piles[i] = []edhcarddealer.Card{}
+		}
+	*/
+	// Distribute cards into piles
+	for i := 0; i < len(*c); i++ {
+		piles[i%n] = append(piles[i%n], (*c)[i])
+	}
+	for i := 0; i < n; i++ {
+		reverse(piles[i])
+	}
+	var shuffledDeck []Card
+	for _, pile := range piles {
+		shuffledDeck = append(shuffledDeck, pile...)
+	}
+	*c = shuffledDeck
 }
 
 // Contains checks if a card is in the slice
