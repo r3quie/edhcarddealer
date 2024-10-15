@@ -18,7 +18,8 @@ type Card struct {
 		ArtCrop    string `json:"art_crop"`
 		BorderCrop string `json:"border_crop"`
 	} `json:"image_uris"`
-	ScryUri string `json:"scryfall_uri"`
+	ScryUri  string `json:"scryfall_uri"`
+	TypeLine string `json:"type_line"`
 }
 
 type Cards []Card
@@ -65,11 +66,7 @@ func (c *Cards) PutHandOnBottom() {
 
 func (c *Cards) PileShuffle(n int) {
 	piles := make([][]Card, n)
-	/*
-		for i := 0; i < 8; i++ {
-			piles[i] = []edhcarddealer.Card{}
-		}
-	*/
+
 	// Distribute cards into piles
 	for i := 0; i < len(*c); i++ {
 		piles[i%n] = append(piles[i%n], (*c)[i])
@@ -77,7 +74,7 @@ func (c *Cards) PileShuffle(n int) {
 	for i := 0; i < n; i++ {
 		reverse(piles[i])
 	}
-	var shuffledDeck []Card
+	shuffledDeck := make([]Card, 0, len(*c))
 	for _, pile := range piles {
 		shuffledDeck = append(shuffledDeck, pile...)
 	}
