@@ -28,15 +28,15 @@ func GetCard(cardName string) (Card, error) {
 }
 
 func GetCardByID(cardName string) (Card, error) {
-	for _, card := range ParsedCards {
+	for _, card := range ParsedAllCards {
 		if card.ID == cardName {
 			return card, nil
 		}
 	}
-	for i, card := range ParsedCards {
+	for i, card := range ParsedAllCards {
 		if strings.Contains(card.Name, cardName+" //") {
 			if card.ImgUris.Normal == "" {
-				card.ImgUris, card.OracleText = ParsedCardsInfo[i].CardFaces[0].ImageUris, ParsedCardsInfo[i].CardFaces[0].OracleText
+				card.ImgUris, card.OracleText = ParsedAllCardsInfo[i].CardFaces[0].ImageUris, ParsedAllCardsInfo[i].CardFaces[0].OracleText
 			}
 			return card, nil
 		}
