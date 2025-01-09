@@ -54,18 +54,21 @@ func DownloadOracleCards(path string) {
 }
 
 func DownloadAllCards(path string) {
-	out, err := os.Create(path)
+	// Create a temporary file for downloading
+	tmpPath := path + ".tmp"
+	out, err := os.Create(tmpPath)
 	if err != nil {
 		if e := os.Mkdir("cache", 0755); e != nil {
 			panic(e)
 		}
-		out, err = os.Create(path)
+		out, err = os.Create(tmpPath)
 		if err != nil {
 			panic(err)
 		}
 	}
 	defer out.Close()
 
+	// Get bulk data info
 	res, err := http.Get("https://api.scryfall.com/bulk-data")
 	if err != nil {
 		panic(err)
@@ -77,7 +80,10 @@ func DownloadAllCards(path string) {
 	var bulk BulkData
 	if err := json.Unmarshal(bd, &bulk); err != nil {
 		log.Println(err)
+		return
 	}
+
+	// Download the file
 	for _, d := range bulk.Data {
 		if d.Type == "all_cards" {
 			res, err = http.Get(d.DownloadURI)
@@ -85,20 +91,24 @@ func DownloadAllCards(path string) {
 				panic(err)
 			}
 			defer res.Body.Close()
-			io.Copy(out, res.Body)
+
+			// Use buffered copy
+			buf := make([]byte, 1024*1024) // 1MB buffer
+			if _, err := io.CopyBuffer(out, res.Body, buf); err != nil {
+				log.Printf("Error copying data: %v", err)
+				return
+			}
+			break
 		}
 	}
 
-	// Parse the downloaded cards and save them back to the file
-	cards := ParseAllCards[CardsInfo](path)
-	jsonData, err := json.Marshal(cards)
-	if err != nil {
-		log.Printf("Error marshaling cards: %v", err)
-		return
-	}
+	// Close the file before moving it
+	out.Close()
 
-	if err := os.WriteFile(path, jsonData, 0644); err != nil {
-		log.Printf("Error writing cards to file: %v", err)
+	// Move the temporary file to the final location
+	if err := os.Rename(tmpPath, path); err != nil {
+		log.Printf("Error moving file: %v", err)
+		return
 	}
 }
 
@@ -123,22 +133,28 @@ func ParseCards[T Cards | CardsInfo](path string) T {
 }
 
 func ParseAllCards[T Cards | CardsInfo](path string) T {
-	// Open the file
-	var f []byte
-	for {
-		ff, err := os.ReadFile(path)
-		if err != nil {
-			DownloadAllCards(path)
-			continue
-		}
-		f = ff
-		break
-	}
 	var cs T
 
-	if err := json.Unmarshal(f, &cs); err != nil {
-		log.Println(err)
+	// Open the file
+	f, err := os.Open(path)
+	if err != nil {
+		DownloadAllCards(path)
+		f, err = os.Open(path)
+		if err != nil {
+			log.Printf("Error opening file after download: %v", err)
+			return cs
+		}
 	}
+	defer f.Close()
+
+	// Create a decoder for streaming JSON parsing
+	decoder := json.NewDecoder(f)
+
+	// Parse the JSON array
+	if err := decoder.Decode(&cs); err != nil {
+		log.Printf("Error decoding JSON: %v", err)
+	}
+
 	return cs
 }
 
