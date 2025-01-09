@@ -80,13 +80,25 @@ func DownloadAllCards(path string) {
 	}
 	for _, d := range bulk.Data {
 		if d.Type == "all_cards" {
-			res, err := http.Get(d.DownloadURI)
+			res, err = http.Get(d.DownloadURI)
 			if err != nil {
 				panic(err)
 			}
 			defer res.Body.Close()
 			io.Copy(out, res.Body)
 		}
+	}
+
+	// Parse the downloaded cards and save them back to the file
+	cards := ParseAllCards[CardsInfo](path)
+	jsonData, err := json.Marshal(cards)
+	if err != nil {
+		log.Printf("Error marshaling cards: %v", err)
+		return
+	}
+
+	if err := os.WriteFile(path, jsonData, 0644); err != nil {
+		log.Printf("Error writing cards to file: %v", err)
 	}
 }
 
