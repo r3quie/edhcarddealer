@@ -10,8 +10,11 @@ import (
 
 // takes a card name and returns the card struct from the cards slice
 
-func GetCard(cardName string) (Card, error) {
+func GetCard(cardName string, id bool) (Card, error) {
 	for _, card := range ParsedCards {
+		if id && card.ID == cardName {
+			return card, nil
+		}
 		if card.Name == cardName {
 			return card, nil
 		}
@@ -54,7 +57,8 @@ func InputToLines(i string) []string {
 	return lines
 }
 
-func GetDeck(decklist string) Deck {
+// if id is true, uses the card id, else uses the card name
+func GetDeck(decklist string, id bool) Deck {
 	lines := InputToLines(decklist)
 	var deck Deck
 	// PLEASE TEST IF Sscanf FASTER THAN REGEXP
@@ -68,7 +72,7 @@ func GetDeck(decklist string) Deck {
 
 			countint, _ := strconv.Atoi(count)
 
-			x, err := GetCard(cardName)
+			x, err := GetCard(cardName, id)
 			if err != nil {
 				log.Println(err)
 				continue
@@ -106,7 +110,7 @@ func Simdeal(deck Deck) Result {
 
 func Simulate(decklist string, n int) Results {
 
-	deck := GetDeck(decklist)
+	deck := GetDeck(decklist, false)
 
 	if n > 1000000 {
 		n = 1000000
