@@ -20,6 +20,7 @@ type Card struct {
 	} `json:"image_uris"`
 	ScryUri  string `json:"scryfall_uri"`
 	TypeLine string `json:"type_line"`
+	ID       string `json:"id"`
 }
 
 type Cards []Card

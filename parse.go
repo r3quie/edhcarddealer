@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 )
 
 type BulkData struct {
@@ -16,7 +17,7 @@ type BulkData struct {
 }
 
 // DownloadOracleCards downloads the oracle cards from scryfall and saves them to cache/oracle-cards.json
-func DownloadOracleCards(path string) {
+func DownloadOracleCards(path string, typ string) {
 	out, err := os.Create(path)
 	if err != nil {
 		if e := os.Mkdir("cache", 0755); e != nil {
@@ -42,7 +43,7 @@ func DownloadOracleCards(path string) {
 		log.Println(err)
 	}
 	for _, d := range bulk.Data {
-		if d.Type == "oracle_cards" {
+		if d.Type == typ {
 			res, err := http.Get(d.DownloadURI)
 			if err != nil {
 				panic(err)
@@ -59,7 +60,12 @@ func ParseCards[T Cards | CardsInfo](path string) T {
 	for {
 		ff, err := os.ReadFile(path)
 		if err != nil {
-			DownloadOracleCards(path)
+			if strings.Contains(path, "all") {
+				ParseAllCards(PathToAllCards)
+				continue
+				//panic(fmt.Errorf("all-cards not compiled; download all cards file and compile it"))
+			}
+			DownloadOracleCards(path, "oracle_cards")
 			continue
 		}
 		f = ff
@@ -75,6 +81,44 @@ func ParseCards[T Cards | CardsInfo](path string) T {
 
 var PathToCards = "cache/oracle-cards.json"
 
+var PathToAllCards = "cache/all-cards.json"
+
 var ParsedCards = ParseCards[Cards](PathToCards)
 
 var ParsedCardsInfo = ParseCards[CardsInfo](PathToCards)
+
+var ParsedAllCards = ParseCards[Cards](PathToAllCards)
+
+func ParseAllCards(path string) Cards {
+	DownloadOracleCards("cache/bulk-all-cards.json", "all_cards")
+
+	file, err := os.Open("cache/bulk-all-cards.json")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	decoder := json.NewDecoder(file)
+	var cards Cards
+
+	// Decode the JSON file in chunks to avoid running out of memory
+	if err := decoder.Decode(&cards); err != nil {
+		log.Println(err)
+	}
+
+	outFile, err := os.Create(path)
+	if err != nil {
+		panic(err)
+	}
+	defer outFile.Close()
+
+	encoder := json.NewEncoder(outFile)
+	encoder.SetIndent("", "  ")
+
+	// Encode the struct back to JSON
+	if err := encoder.Encode(cards); err != nil {
+		log.Println(err)
+	}
+
+	return cards
+}
