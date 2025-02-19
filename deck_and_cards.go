@@ -7,7 +7,6 @@ import (
 
 type Card struct {
 	Name          string `json:"name"`
-	ID            string `json:"id"`
 	ProducedMana  []any  `json:"produced_mana"`
 	ColorIdentity []any  `json:"color_identity"`
 	OracleText    string `json:"oracle_text"`

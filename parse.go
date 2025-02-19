@@ -53,55 +53,6 @@ func DownloadOracleCards(path string) {
 	}
 }
 
-func DownloadAllCards(path string) {
-	out, err := os.Create(path)
-	if err != nil {
-		if e := os.Mkdir("cache", 0755); e != nil {
-			panic(e)
-		}
-		out, err = os.Create(path)
-		if err != nil {
-			panic(err)
-		}
-	}
-	defer out.Close()
-
-	res, err := http.Get("https://api.scryfall.com/bulk-data")
-	if err != nil {
-		panic(err)
-	}
-	defer res.Body.Close()
-
-	bd, _ := io.ReadAll(res.Body)
-
-	var bulk BulkData
-	if err := json.Unmarshal(bd, &bulk); err != nil {
-		log.Println(err)
-	}
-	for _, d := range bulk.Data {
-		if d.Type == "all_cards" {
-			res, err = http.Get(d.DownloadURI)
-			if err != nil {
-				panic(err)
-			}
-			defer res.Body.Close()
-			io.Copy(out, res.Body)
-		}
-	}
-
-	// Parse the downloaded cards and save them back to the file
-	cards := ParseAllCards[CardsInfo](path)
-	jsonData, err := json.Marshal(cards)
-	if err != nil {
-		log.Printf("Error marshaling cards: %v", err)
-		return
-	}
-
-	if err := os.WriteFile(path, jsonData, 0644); err != nil {
-		log.Printf("Error writing cards to file: %v", err)
-	}
-}
-
 func ParseCards[T Cards | CardsInfo](path string) T {
 	// Open the file
 	var f []byte
@@ -122,33 +73,8 @@ func ParseCards[T Cards | CardsInfo](path string) T {
 	return cs
 }
 
-func ParseAllCards[T Cards | CardsInfo](path string) T {
-	// Open the file
-	var f []byte
-	for {
-		ff, err := os.ReadFile(path)
-		if err != nil {
-			DownloadAllCards(path)
-			continue
-		}
-		f = ff
-		break
-	}
-	var cs T
-
-	if err := json.Unmarshal(f, &cs); err != nil {
-		log.Println(err)
-	}
-	return cs
-}
-
 var PathToCards = "cache/oracle-cards.json"
 
-var PathToAllCards = "cache/all-cards.json"
-
 var ParsedCards = ParseCards[Cards](PathToCards)
-
-var ParsedAllCards = ParseAllCards[Cards](PathToAllCards)
-var ParsedAllCardsInfo = ParseAllCards[CardsInfo](PathToAllCards)
 
 var ParsedCardsInfo = ParseCards[CardsInfo](PathToCards)

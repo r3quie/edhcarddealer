@@ -27,23 +27,6 @@ func GetCard(cardName string) (Card, error) {
 	return Card{}, fmt.Errorf("Card " + cardName + " not found")
 }
 
-func GetCardByID(cardName string) (Card, error) {
-	for _, card := range ParsedAllCards {
-		if card.ID == cardName {
-			return card, nil
-		}
-	}
-	for i, card := range ParsedAllCards {
-		if strings.Contains(card.Name, cardName+" //") {
-			if card.ImgUris.Normal == "" {
-				card.ImgUris, card.OracleText = ParsedAllCardsInfo[i].CardFaces[0].ImageUris, ParsedAllCardsInfo[i].CardFaces[0].OracleText
-			}
-			return card, nil
-		}
-	}
-	return Card{}, fmt.Errorf("Card " + cardName + " not found")
-}
-
 // takes a string of cards for MTGO and returns Cards
 
 func InputToLines(i string) []string {
@@ -86,37 +69,6 @@ func GetDeck(decklist string) Deck {
 			countint, _ := strconv.Atoi(count)
 
 			x, err := GetCard(cardName)
-			if err != nil {
-				log.Println(err)
-				continue
-			}
-			if len(deck.ColorIdentity) < len(x.ColorIdentity) {
-				deck.ColorIdentity = x.ColorIdentity
-			}
-			for k := 0; k < countint; k++ {
-				deck.Cards = append(deck.Cards, x)
-			}
-		}
-	}
-
-	return deck
-}
-
-func GetDeckByID(decklist string) Deck {
-	lines := InputToLines(decklist)
-	var deck Deck
-	// PLEASE TEST IF Sscanf FASTER THAN REGEXP
-	re := regexp.MustCompile(`^(\d+)\s+(.*)$`)
-
-	for _, line := range lines {
-		match := re.FindStringSubmatch(strings.TrimSpace(line))
-		if len(match) == 3 {
-			count := match[1]
-			cardName := match[2]
-
-			countint, _ := strconv.Atoi(count)
-
-			x, err := GetCardByID(cardName)
 			if err != nil {
 				log.Println(err)
 				continue
