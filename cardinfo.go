@@ -17,12 +17,9 @@ type CardInfo struct {
 	HighresImage  bool   `json:"highres_image"`
 	ImageStatus   string `json:"image_status"`
 	ImageUris     struct {
-		Small      string `json:"small"`
-		Normal     string `json:"normal"`
-		Large      string `json:"large"`
-		Png        string `json:"png"`
-		ArtCrop    string `json:"art_crop"`
-		BorderCrop string `json:"border_crop"`
+		Small  string `json:"small"`
+		Normal string `json:"normal"`
+		Large  string `json:"large"`
 	} `json:"image_uris,omitempty"`
 	ManaCost      string  `json:"mana_cost,omitempty"`
 	Cmc           float64 `json:"cmc"`
@@ -120,12 +117,9 @@ type CardInfo struct {
 		ArtistID       string `json:"artist_id"`
 		IllustrationID string `json:"illustration_id"`
 		ImageUris      struct {
-			Small      string `json:"small"`
-			Normal     string `json:"normal"`
-			Large      string `json:"large"`
-			Png        string `json:"png"`
-			ArtCrop    string `json:"art_crop"`
-			BorderCrop string `json:"border_crop"`
+			Small  string `json:"small"`
+			Normal string `json:"normal"`
+			Large  string `json:"large"`
 		} `json:"image_uris"`
 	} `json:"card_faces,omitempty"`
 }

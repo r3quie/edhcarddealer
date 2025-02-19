@@ -11,12 +11,9 @@ type Card struct {
 	ColorIdentity []any  `json:"color_identity"`
 	OracleText    string `json:"oracle_text"`
 	ImgUris       struct {
-		Small      string `json:"small"`
-		Normal     string `json:"normal"`
-		Large      string `json:"large"`
-		Png        string `json:"png"`
-		ArtCrop    string `json:"art_crop"`
-		BorderCrop string `json:"border_crop"`
+		Small  string `json:"small"`
+		Normal string `json:"normal"`
+		Large  string `json:"large"`
 	} `json:"image_uris"`
 	ScryUri  string `json:"scryfall_uri"`
 	TypeLine string `json:"type_line"`

@@ -1,20 +1,18 @@
 package edhcarddealer
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
 )
 
 // takes a card name and returns the card struct from the cards slice
-
-func GetCard(cardName string, id bool) (Card, error) {
+func GetCard(cardName string) (Card, error) {
 	for _, card := range ParsedCards {
-		if id && card.ID == cardName {
-			return card, nil
-		}
 		if card.Name == cardName {
 			return card, nil
 		}
@@ -27,7 +25,21 @@ func GetCard(cardName string, id bool) (Card, error) {
 			return card, nil
 		}
 	}
-	return Card{}, fmt.Errorf("Card " + cardName + " not found")
+	return Card{}, fmt.Errorf("card not found")
+}
+
+func GetCardByID(cardID string) (Card, error) {
+	cardFile, err := os.ReadFile("cache/add_cards/" + cardID + ".json")
+	if err != nil {
+		log.Println(err)
+		return Card{}, fmt.Errorf("card not found")
+	}
+	var card Card
+	err = json.Unmarshal(cardFile, &card)
+	if err != nil {
+		return Card{}, err
+	}
+	return card, nil
 }
 
 // takes a string of cards for MTGO and returns Cards
@@ -72,11 +84,18 @@ func GetDeck(decklist string, id bool) Deck {
 
 			countint, _ := strconv.Atoi(count)
 
-			x, err := GetCard(cardName, id)
+			var x Card
+			var err error
+			if id {
+				x, err = GetCardByID(cardName)
+			} else {
+				x, err = GetCard(cardName)
+			}
 			if err != nil {
 				log.Println(err)
 				continue
 			}
+
 			if len(deck.ColorIdentity) < len(x.ColorIdentity) {
 				deck.ColorIdentity = x.ColorIdentity
 			}

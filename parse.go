@@ -1,12 +1,12 @@
 package edhcarddealer
 
 import (
+	"bufio"
 	"encoding/json"
 	"io"
 	"log"
 	"net/http"
 	"os"
-	"strings"
 )
 
 type BulkData struct {
@@ -60,11 +60,6 @@ func ParseCards[T Cards | CardsInfo](path string) T {
 	for {
 		ff, err := os.ReadFile(path)
 		if err != nil {
-			if strings.Contains(path, "all") {
-				ParseAllCards(PathToAllCards)
-				continue
-				//panic(fmt.Errorf("all-cards not compiled; download all cards file and compile it"))
-			}
 			DownloadOracleCards(path, "oracle_cards")
 			continue
 		}
@@ -81,16 +76,15 @@ func ParseCards[T Cards | CardsInfo](path string) T {
 
 var PathToCards = "cache/oracle-cards.json"
 
-var PathToAllCards = "cache/all-cards.json"
+var PathToAllCards = "cache/all_cards"
 
 var ParsedCards = ParseCards[Cards](PathToCards)
 
 var ParsedCardsInfo = ParseCards[CardsInfo](PathToCards)
 
-var ParsedAllCards = ParseCards[Cards](PathToAllCards)
-
-func ParseAllCards(path string) Cards {
+func ParseAllCards(path string) {
 	DownloadOracleCards("cache/bulk-all-cards.json", "all_cards")
+	os.Mkdir("cache/all_cards", 0755)
 
 	file, err := os.Open("cache/bulk-all-cards.json")
 	if err != nil {
@@ -98,27 +92,22 @@ func ParseAllCards(path string) Cards {
 	}
 	defer file.Close()
 
-	decoder := json.NewDecoder(file)
-	var cards Cards
-
-	// Decode the JSON file in chunks to avoid running out of memory
-	if err := decoder.Decode(&cards); err != nil {
-		log.Println(err)
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		var card Card
+		if err := json.Unmarshal(scanner.Bytes(), &card); err != nil {
+			continue
+		}
+		outFile, err := os.Create("cache/all_cards/" + card.ID + ".json")
+		if err != nil {
+			panic(err)
+		}
+		defer outFile.Close()
+		b, _ := json.Marshal(card)
+		outFile.Write(b)
 	}
 
-	outFile, err := os.Create(path)
-	if err != nil {
-		panic(err)
+	if err := scanner.Err(); err != nil {
+		return
 	}
-	defer outFile.Close()
-
-	encoder := json.NewEncoder(outFile)
-	encoder.SetIndent("", "  ")
-
-	// Encode the struct back to JSON
-	if err := encoder.Encode(cards); err != nil {
-		log.Println(err)
-	}
-
-	return cards
 }
