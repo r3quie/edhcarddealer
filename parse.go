@@ -76,29 +76,46 @@ func ParseCards[T Cards | CardsInfo](path string) T {
 
 var PathToCards = "cache/oracle-cards.json"
 
-var PathToAllCards = "cache/all_cards"
+var PathToAllCards = initAllCards()
 
 var ParsedCards = ParseCards[Cards](PathToCards)
 
 var ParsedCardsInfo = ParseCards[CardsInfo](PathToCards)
 
-func ParseAllCards(path string) {
-	DownloadOracleCards("cache/bulk-all-cards.json", "all_cards")
-	os.Mkdir("cache/all_cards", 0755)
+func initAllCards() string {
+	_, err := os.ReadDir("cache/all_cards")
+	if err != nil {
+		os.Mkdir("cache/all_cards", 0755)
+		ParseAllCards("cache/all_cards/")
+	}
+	return "cache/all_cards/"
+}
 
+func ParseAllCards(path string) {
 	file, err := os.Open("cache/bulk-all-cards.json")
+	if err != nil {
+		DownloadOracleCards("cache/bulk-all-cards.json", "all_cards")
+		file, err = os.Open("cache/bulk-all-cards.json")
+	}
 	if err != nil {
 		panic(err)
 	}
 	defer file.Close()
 
 	scanner := bufio.NewScanner(file)
+	const maxCapacity int = 1000000
+	buf := make([]byte, maxCapacity)
+	scanner.Buffer(buf, maxCapacity)
 	for scanner.Scan() {
 		var card Card
-		if err := json.Unmarshal(scanner.Bytes(), &card); err != nil {
+		if len(scanner.Text()) < 4 {
 			continue
 		}
-		outFile, err := os.Create("cache/all_cards/" + card.ID + ".json")
+		if err := json.Unmarshal(scanner.Bytes()[:len(scanner.Bytes())-1], &card); err != nil {
+			log.Println("continueing", err.Error())
+			continue
+		}
+		outFile, err := os.Create(path + card.ID + ".json")
 		if err != nil {
 			panic(err)
 		}

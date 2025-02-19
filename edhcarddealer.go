@@ -29,7 +29,7 @@ func GetCard(cardName string) (Card, error) {
 }
 
 func GetCardByID(cardID string) (Card, error) {
-	cardFile, err := os.ReadFile("cache/add_cards/" + cardID + ".json")
+	cardFile, err := os.ReadFile("cache/all_cards/" + cardID + ".json")
 	if err != nil {
 		log.Println(err)
 		return Card{}, fmt.Errorf("card not found")
