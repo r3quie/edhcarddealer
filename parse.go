@@ -83,7 +83,7 @@ var ParsedCards = ParseCards[Cards](PathToCards)
 var ParsedCardsInfo = ParseCards[CardsInfo](PathToCards)
 
 func initAllCards() string {
-	_, err := os.ReadDir("cache/all_cards")
+	_, err := os.Stat("cache/all_cards")
 	if err != nil {
 		os.Mkdir("cache/all_cards", 0755)
 		ParseAllCards("cache/all_cards/")
