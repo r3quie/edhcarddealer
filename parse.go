@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"slices"
 )
 
 type BulkData struct {
@@ -14,6 +15,24 @@ type BulkData struct {
 		Type        string `json:"type"`
 		DownloadURI string `json:"download_uri"`
 	} `json:"data"`
+}
+
+func customGet(url string) *http.Response {
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		panic(err)
+	}
+
+	// Set the User-Agent header
+	req.Header.Set("User-Agent", "mtg.r3quie@"+VERSION)
+	req.Header.Set("Accept", "application/json")
+
+	client := &http.Client{}
+	res, err := client.Do(req)
+	if err != nil {
+		panic(err)
+	}
+	return res
 }
 
 // DownloadOracleCards downloads the oracle cards from scryfall and saves them to cache/oracle-cards.json
@@ -30,12 +49,8 @@ func DownloadOracleCards(path string, typ string) {
 	}
 	defer out.Close()
 
-	res, err := http.Get("https://api.scryfall.com/bulk-data")
-	if err != nil {
-		panic(err)
-	}
+	res := customGet("https://api.scryfall.com/bulk-data")
 	defer res.Body.Close()
-
 	bd, _ := io.ReadAll(res.Body)
 
 	var bulk BulkData
@@ -44,10 +59,7 @@ func DownloadOracleCards(path string, typ string) {
 	}
 	for _, d := range bulk.Data {
 		if d.Type == typ {
-			res, err := http.Get(d.DownloadURI)
-			if err != nil {
-				panic(err)
-			}
+			res := customGet(d.DownloadURI)
 			defer res.Body.Close()
 			io.Copy(out, res.Body)
 		}
@@ -113,6 +125,50 @@ func ParseAllCards(path string) {
 		}
 		if err := json.Unmarshal(scanner.Bytes()[:len(scanner.Bytes())-1], &card); err != nil {
 			log.Println("continueing", err.Error())
+			continue
+		}
+		outFile, err := os.Create(path + card.ID + ".json")
+		if err != nil {
+			panic(err)
+		}
+		defer outFile.Close()
+		b, _ := json.Marshal(card)
+		outFile.Write(b)
+	}
+
+	if err := scanner.Err(); err != nil {
+		return
+	}
+}
+
+func UpdateAllCards(path string) {
+	DownloadOracleCards("cache/bulk-all-cards.json", "all_cards")
+	file, err := os.Open("cache/bulk-all-cards.json")
+	if err != nil {
+		panic(err)
+	}
+	defer file.Close()
+
+	dir, _ := os.ReadDir(path)
+	dirNames := make([]string, len(dir))
+	for i, d := range dir {
+		dirNames[i] = d.Name()
+	}
+
+	scanner := bufio.NewScanner(file)
+	const maxCapacity int = 1000000
+	buf := make([]byte, maxCapacity)
+	scanner.Buffer(buf, maxCapacity)
+	for scanner.Scan() {
+		var card Card
+		if len(scanner.Text()) < 4 {
+			continue
+		}
+		if err := json.Unmarshal(scanner.Bytes()[:len(scanner.Bytes())-1], &card); err != nil {
+			log.Println("continueing", err.Error())
+			continue
+		}
+		if slices.Contains(dirNames, card.ID+".json") {
 			continue
 		}
 		outFile, err := os.Create(path + card.ID + ".json")

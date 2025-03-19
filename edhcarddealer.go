@@ -10,6 +10,8 @@ import (
 	"strings"
 )
 
+const VERSION = "0.5.4"
+
 // takes a card name and returns the card struct from the cards slice
 func GetCard(cardName string) (Card, error) {
 	for _, card := range ParsedCards {
